@@ -1,10 +1,17 @@
+checks:
+  php: true
+
 build:
   nodes:
-    my-tests-with-coverage:
+    analysis:
       tests:
         override:
           - php-scrutinizer-run
           - phpcs-run
+
+    my-tests-with-coverage:
+      tests:
+        override:
           - command: phpunit --coverage-clover=my-coverage-file
             coverage:
               file: my-coverage-file

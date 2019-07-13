@@ -20,4 +20,10 @@ class MyClassTest extends TestCase
         $myClass = new MyClass();
         $this->assertEquals(9, $myClass->sum(3, 3));
     }
+
+    public function testEchoWithOneHundred(): void
+    {
+        $myClass = new MyClass();
+        $this->assertEquals(103, $myClass->sum(100, 3));
+    }
 }
