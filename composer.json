@@ -1,0 +1,10 @@
+{
+    "name": "roman/layered-cache",
+    "authors": [
+        {
+            "name": "'Roman'",
+            "email": "masorinwork@gmail.com"
+        }
+    ],
+    "require": {}
+}
