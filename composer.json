@@ -21,12 +21,14 @@
     "hooks": {
       "pre-commit": [
         "echo committing as $(git config user.name)",
-        "./vendor/bin/php-cs-fixer fix ."
+        "./vendor/bin/php-cs-fixer fix . --rules=@PSR2,@Symfony",
+        "git add ."
       ]
     }
   },
   "scripts": {
     "cghooks": "cghooks",
+    "cghooks:update": "cghooks update",
     "post-install-cmd": "cghooks add --ignore-lock",
     "post-update-cmd": "cghooks update"
   }

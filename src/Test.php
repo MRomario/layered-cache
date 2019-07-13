@@ -4,9 +4,7 @@ namespace App;
 
 class Test
 {
-    public function test($string=false){
+    public function test($string = false)
+    {
     }
-
-
-
 }
