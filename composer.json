@@ -15,8 +15,8 @@
   "extra": {
     "hooks": {
       "pre-commit": [
-        "echo committing as $(git config user.name) $(pwd)",
-        "../../../vendor/bin/php-cs-fixer fix ."
+        "echo committing as $(git config user.name)",
+        "./vendor/bin/php-cs-fixer fix ."
       ]
     }
   },
