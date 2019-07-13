@@ -1,14 +1,23 @@
 {
-    "name": "roman/layered-cache",
-    "authors": [
-        {
-            "name": "'Roman'",
-            "email": "masorinwork@gmail.com"
-        }
-    ],
-    "require": {},
-    "require-dev": {
-        "phpunit/phpunit": "^8.2",
-        "friendsofphp/php-cs-fixer": "^2.15"
+  "name": "roman/layered-cache",
+  "authors": [
+    {
+      "name": "'Roman'",
+      "email": "masorinwork@gmail.com"
     }
+  ],
+  "require": {},
+  "require-dev": {
+    "phpunit/phpunit": "^8.2",
+    "friendsofphp/php-cs-fixer": "^2.15",
+    "brainmaestro/composer-git-hooks": "^2.7"
+  },
+  "extra": {
+    "hooks": {
+      "pre-commit": [
+        "echo committing as $(git config user.name)",
+        "php-cs-fixer fix ."
+      ]
+    }
+  }
 }
