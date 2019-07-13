@@ -1,0 +1,11 @@
+build:
+  nodes:
+    my-tests-with-coverage:
+      tests:
+        override:
+          - php-scrutinizer-run
+          - phpcs-run
+          - command: phpunit --coverage-clover=my-coverage-file
+            coverage:
+              file: my-coverage-file
+              format: php-clover
