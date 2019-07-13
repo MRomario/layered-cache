@@ -14,4 +14,10 @@ class MyClassTest extends TestCase
         $myClass = new MyClass();
         $this->assertEquals(3, $myClass->sum(1, 2));
     }
+
+    public function testGetSquaredOnEqualArgs(): void
+    {
+        $myClass = new MyClass();
+        $this->assertEquals(9, $myClass->sum(3, 3));
+    }
 }
