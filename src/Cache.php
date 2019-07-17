@@ -4,56 +4,91 @@ namespace App;
 
 class Cache
 {
-    public $storages;
-    public $emptyStorages;
+    public $storage;
+    public $emptyStorage;
 
+    /**
+     * @param object - new layer storage
+     */
     public function addStorage(object $storage): void
     {
-        $this->storages[] = $storage;
+        $this->storage[] = $storage;
     }
 
+    /**
+     * @param string $key   - key value
+     * @param mixed  $value - value
+     * @param int    $ttl
+     */
     public function set(string $key, $value, $ttl = 3600): void
     {
         $this->setKey($key, $value, $ttl);
     }
 
+    /**
+     * @param string $key - key value
+     *
+     * @return mixed - value
+     */
     public function get(string $key)
     {
         $value = $this->getKey($key);
-        $this->checkEmptyStorages($key, $value);
+        (empty($this->emptyStorage)) ?: $this->checkEmptyStorage($key, $value);
 
         return $value;
     }
 
-    public function checkEmptyStorages($key, $value): void
+    /**
+     * Method rewrite key->value to empty storage.
+     *
+     * @param string $key   - key value
+     * @param mixed  $value - value
+     */
+    public function checkEmptyStorage($key, $value): void
     {
-        if ($this->emptyStorages) {
-            foreach ($this->emptyStorages as $storage) {
-                $storage->set($key, $value);
+        if ($value) {
+            if ($this->emptyStorage) {
+                foreach ($this->emptyStorage as $storage) {
+                    $storage->set($key, $value);
+                }
             }
+            $this->emptyStorage = [];
         }
-        $this->emptyStorages = [];
     }
 
+    /**
+     * Method search key->value from all layers.
+     *
+     * @param string $key - key value
+     *
+     * @return mixed
+     */
     public function getKey(string $key)
     {
         $value = null;
-        foreach ($this->storages as $storage) {
+        foreach ($this->storage as $storage) {
             $value = $storage->get($key);
             if ($value) {
                 break;
             } else {
-                $this->emptyStorages[] = $storage;
+                $this->emptyStorage[] = $storage;
             }
         }
 
         return $value;
     }
 
-    public function setKey(string $key, $value)
+    /**
+     * Method set key->value to all storage.
+     *
+     * @param string $key   - key value
+     * @param mixed  $value - value
+     * @param $ttl
+     */
+    public function setKey(string $key, $value, $ttl): void
     {
-        foreach ($this->storages as $storage) {
-            $storage->set($key, $value);
+        foreach ($this->storage as $storage) {
+            $storage->set($key, $value, $ttl);
         }
     }
 }
