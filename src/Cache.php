@@ -25,6 +25,8 @@ class Cache
     public function set(string $key, $value, $ttl = 3600): void
     {
         $this->setKey($key, $value, $ttl);
+
+        return;
     }
 
     /**
@@ -58,6 +60,8 @@ class Cache
             }
             $this->emptyStorages = [];
         }
+
+        return;
     }
 
     /**
@@ -94,5 +98,7 @@ class Cache
         foreach ($this->storages as $storage) {
             $storage->set($key, $value, $ttl);
         }
+
+        return;
     }
 }
