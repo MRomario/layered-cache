@@ -38,7 +38,7 @@ class CacheTest extends TestCase
     {
         $class = new Cache();
         $class->emptyStorages[] = new CacheStatic();
-        $this->assertNull($class->checkEmptyStorage('name', 'roman'));
+        $this->assertNull($class->checkEmptyStorages('name', 'roman'));
     }
 
     /**
@@ -49,6 +49,6 @@ class CacheTest extends TestCase
     {
         $class = new Cache();
         $class->emptyStorages[] = new CacheStatic();
-        $this->assertNull($class->checkEmptyStorage('name', false));
+        $this->assertNull($class->checkEmptyStorages('name', false));
     }
 }
