@@ -7,20 +7,20 @@ namespace App;
 class Cache implements CacheInterface
 {
     /**
-     * @var array
+     * @var array - array all storages
      */
-    public $storages;
+    public $storage;
     /**
-     * @var array
+     * @var array - array storages with out keys
      */
     public $emptyStorages;
 
     /**
      * @param object storage - new layer storage
      */
-    public function addStorage(object $storage): void
+    public function addStorage(object $layer): void
     {
-        $this->storages[] = $storage;
+        $this->storage[] = $layer;
     }
 
     /**
@@ -81,14 +81,12 @@ class Cache implements CacheInterface
      */
     public function getKey(string $key)
     {
-        $value = null;
-        foreach ($this->storages as $storage) {
-            $value = $storage->get($key);
+        foreach ($this->storage as $layer) {
+            $value = $layer->get($key);
             if ($value) {
-                break;
-            } else {
-                $this->emptyStorages[] = $storage;
+                return $value;
             }
+            $this->emptyStorages[] = $layer;
         }
 
         return $value;
@@ -103,8 +101,8 @@ class Cache implements CacheInterface
      */
     public function setKey(string $key, $value, $ttl): void
     {
-        foreach ($this->storages as $storage) {
-            $storage->set($key, $value, $ttl);
+        foreach ($this->storage as $layer) {
+            $layer->set($key, $value, $ttl);
         }
 
         return;
