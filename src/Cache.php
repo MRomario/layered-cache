@@ -81,6 +81,7 @@ class Cache implements CacheInterface
      */
     public function getKey(string $key)
     {
+        $value = null;
         foreach ($this->storage as $layer) {
             $value = $layer->get($key);
             if ($value) {
