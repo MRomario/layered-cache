@@ -4,9 +4,15 @@ declare(strict_types=1);
 
 namespace App;
 
-class Cache
+class Cache implements CacheInterface
 {
+    /**
+     * @var array
+     */
     public $storages;
+    /**
+     * @var array
+     */
     public $emptyStorages;
 
     /**
