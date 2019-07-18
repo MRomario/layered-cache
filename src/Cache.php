@@ -7,7 +7,7 @@ namespace App;
 class Cache implements CacheInterface
 {
     /**
-     * @var array - array all storages
+     * @var array - array all storages StrorageInterface
      */
     public $storage;
     /**
