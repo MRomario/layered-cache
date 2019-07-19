@@ -11,7 +11,7 @@ class CacheStatic implements CacheInterface
      *
      * @return array
      */
-    protected $data;
+    protected $data = ['test', 'test value'];
 
     /**
      * @param string $key
@@ -30,7 +30,7 @@ class CacheStatic implements CacheInterface
      *
      * @return mixed
      */
-    public function set(string $key, $value, $ttl = 3600)
+    public function set(string $key, $value, $ttl = 3600): void
     {
         // TODO: Implement set() method.
     }

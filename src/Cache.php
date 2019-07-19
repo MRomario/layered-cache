@@ -33,7 +33,7 @@ class Cache implements CacheInterface, CachePoolInterface
         foreach ($this->pool as $layerCache) {
             $value = $layerCache->get($key);
 
-            return (!$value) ?: $value;
+            return ($value) ?: $value;
         }
     }
 
