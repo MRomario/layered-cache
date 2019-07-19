@@ -4,108 +4,66 @@ declare(strict_types=1);
 
 namespace App;
 
-class Cache implements CacheInterface
+use App\CacheException as CacheException;
+
+class Cache implements CacheInterface, CachePoolInterface
 {
     /**
-     * @var array - array all storages StrorageInterface
-     */
-    public $storage;
-    /**
-     * @var array - array storages with out keys
-     */
-    public $emptyStorages;
-
-    /**
-     * @param object storage - new layer storage
-     */
-    public function addStorage(object $layer): void
-    {
-        $this->storage[] = $layer;
-    }
-
-    /**
-     * Method set key->value storage.
+     * @param array $pool
      *
-     * @param string $key   - key value
-     * @param mixed  $value - value
-     * @param int    $ttl
+     * @return array
      */
-    public function set(string $key, $value, $ttl = 3600): void
-    {
-        $this->setKey($key, $value, $ttl);
-
-        return;
-    }
+    protected $pool;
 
     /**
-     * Method get key->value from storage.
+     * Get key from pool.
      *
-     * @param string $key - key value
+     * @param string $key
      *
-     * @return mixed - value
+     * @return mixed
+     *
+     * @throws \App\CacheException
      */
     public function get(string $key)
     {
-        $value = $this->getKey($key);
-        (empty($this->emptyStorages)) ?: $this->checkEmptyStorages($key, $value);
+        if (!$this->pool) {
+            throw new CacheException(CacheException::POOL_EMPTY);
+        }
 
-        return $value;
+        foreach ($this->pool as $layerCache) {
+            $value = $layerCache->get($key);
+
+            return (!$value) ?: $value;
+        }
     }
 
     /**
-     * Method rewrite key->value to all empty storage.
+     * Set key to poll.
      *
-     * @param string $key   - key value
-     * @param mixed  $value - value
+     * @param string $key
+     * @param $value
+     * @param int $ttl
+     *
+     * @throws \App\CacheException
      */
-    public function checkEmptyStorages($key, $value): void
+    public function set(string $key, $value, $ttl = 3600): void
     {
-        if ($value) {
-            if ($this->emptyStorages) {
-                foreach ($this->emptyStorages as $storage) {
-                    $storage->set($key, $value);
-                }
-            }
-            $this->emptyStorages = [];
+        if (!$this->pool) {
+            throw new CacheException(CacheException::POOL_EMPTY);
         }
 
-        return;
+        foreach ($this->pool as $layerCache) {
+            $layerCache->set($key);
+        }
     }
 
     /**
-     * Method search key->value from all storage.
+     * Add cache layer to poll.
      *
-     * @param string $key - key value
-     *
-     * @return mixed value
+     * @param CacheInterface $layer
      */
-    public function getKey(string $key)
+    public function addLayer(CacheInterface $layer): void
     {
-        $value = null;
-        foreach ($this->storage as $layer) {
-            $value = $layer->get($key);
-            if ($value) {
-                return $value;
-            }
-            $this->emptyStorages[] = $layer;
-        }
-
-        return $value;
-    }
-
-    /**
-     * Method set key->value to all storage.
-     *
-     * @param string $key   - key value
-     * @param mixed  $value - value
-     * @param int    $ttl
-     */
-    public function setKey(string $key, $value, $ttl): void
-    {
-        foreach ($this->storage as $layer) {
-            $layer->set($key, $value, $ttl);
-        }
-
-        return;
+        $this->pool[] = $layer;
     }
 }

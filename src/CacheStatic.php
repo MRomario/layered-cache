@@ -6,17 +6,12 @@ namespace App;
 
 class CacheStatic implements CacheInterface
 {
-    public $data;
-
     /**
-     * @param string $key
-     * @param $value
-     * @param int $ttl
+     * @param array
+     *
+     * @return array
      */
-    public function set(string $key, $value, $ttl = 3600): void
-    {
-        $this->data[$key] = $value;
-    }
+    protected $data;
 
     /**
      * @param string $key
@@ -25,6 +20,18 @@ class CacheStatic implements CacheInterface
      */
     public function get(string $key)
     {
-        return $this->data[$key];
+        // TODO: Implement get() method.
+    }
+
+    /**
+     * @param string $key
+     * @param $value
+     * @param int $ttl
+     *
+     * @return mixed
+     */
+    public function set(string $key, $value, $ttl = 3600)
+    {
+        // TODO: Implement set() method.
     }
 }
