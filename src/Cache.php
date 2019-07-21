@@ -4,66 +4,69 @@ declare(strict_types=1);
 
 namespace App;
 
-use App\CacheException as CacheException;
+use App\Exception\EmptyKeyException;
+use App\Exception\EmptyPoolException;
+use App\Exception\KeyNotFoundException;
+use App\Exception\OutdatedCacheException;
 
-class Cache implements CacheInterface, CachePoolInterface
+class Cache implements CacheLayerInterface
 {
     /**
-     * @param array $pool
-     *
-     * @return array
+     * @var CacheLayerInterface[]
      */
-    protected $pool;
+    protected $layers = [];
 
     /**
-     * Get key from pool.
+     * {@inheritdoc}
      *
-     * @param string $key
-     *
-     * @return mixed
-     *
-     * @throws \App\CacheException
+     * @throws EmptyPoolException
      */
     public function get(string $key)
     {
-        if (!$this->pool) {
-            throw new CacheException(CacheException::POOL_EMPTY);
+        if ('' === trim($key)) {
+            throw new EmptyKeyException();
         }
 
-        foreach ($this->pool as $layerCache) {
-            $value = $layerCache->get($key);
+        if (empty($this->layers)) {
+            throw new EmptyPoolException();
+        }
 
-            return ($value) ?: $value;
+        foreach ($this->layers as $layer) {
+            try {
+                $value = $layer->get($key);
+            } catch (KeyNotFoundException | OutdatedCacheException $e) {
+                continue;
+            }
+
+            return $value;
         }
     }
 
     /**
-     * Set key to poll.
+     * {@inheritdoc}
      *
-     * @param string $key
-     * @param $value
-     * @param int $ttl
-     *
-     * @throws \App\CacheException
+     * @throws EmptyPoolException
      */
     public function set(string $key, $value, $ttl = 3600): void
     {
-        if (!$this->pool) {
-            throw new CacheException(CacheException::POOL_EMPTY);
+        if ('' === trim($key)) {
+            throw new EmptyKeyException();
         }
 
-        foreach ($this->pool as $layerCache) {
-            $layerCache->set($key);
+        if (empty($this->layers)) {
+            throw new EmptyPoolException();
+        }
+
+        foreach ($this->layers as $layer) {
+            $layer->set($key, $value, $ttl);
         }
     }
 
     /**
-     * Add cache layer to poll.
-     *
-     * @param CacheInterface $layer
+     * {@inheritdoc}
      */
     public function addLayer(CacheInterface $layer): void
     {
-        $this->pool[] = $layer;
+        $this->layers[] = $layer;
     }
 }
