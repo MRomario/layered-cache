@@ -32,15 +32,17 @@ class Cache implements CacheLayerInterface
             throw new EmptyPoolException();
         }
 
+        $outdatedKey = false;
         foreach ($this->layers as $layer) {
             try {
-                $value = $layer->get($key);
-            } catch (KeyNotFoundException | OutdatedCacheException $e) {
+                return $layer->get($key);
+            } catch (KeyNotFoundException $e) {
                 continue;
+            } catch (OutdatedCacheException $e) {
+                $outdatedKey = true;
             }
-
-            return $value;
         }
+        throw $outdatedKey ? new OutdatedCacheException($key) : new KeyNotFoundException($key);
     }
 
     /**
@@ -54,11 +56,9 @@ class Cache implements CacheLayerInterface
         if ('' === trim($key)) {
             throw new EmptyKeyException();
         }
-
         if (empty($this->layers)) {
             throw new EmptyPoolException();
         }
-
         foreach ($this->layers as $layer) {
             $layer->set($key, $value, $ttl);
         }
