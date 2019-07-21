@@ -19,6 +19,7 @@ class Cache implements CacheLayerInterface
     /**
      * {@inheritdoc}
      *
+     * @throws EmptyKeyException
      * @throws EmptyPoolException
      */
     public function get(string $key)
@@ -45,6 +46,7 @@ class Cache implements CacheLayerInterface
     /**
      * {@inheritdoc}
      *
+     * @throws EmptyKeyException
      * @throws EmptyPoolException
      */
     public function set(string $key, $value, $ttl = 3600): void

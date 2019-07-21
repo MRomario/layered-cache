@@ -55,4 +55,8 @@ class CacheTest extends TestCase
         $testKey = 'test';
         $this->cache->get($testKey);
     }
+
+    public function testGetKeyNotFoundException()
+    {
+    }
 }
