@@ -18,9 +18,6 @@ class Cache implements CacheLayerInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @throws EmptyKeyException
-     * @throws EmptyPoolException
      */
     public function get(string $key)
     {
@@ -28,9 +25,7 @@ class Cache implements CacheLayerInterface
             throw new EmptyKeyException();
         }
 
-        if (empty($this->layers)) {
-            throw new EmptyPoolException();
-        }
+        $this->checkIsNotEmptyPool();
 
         $outdatedKey = false;
         foreach ($this->layers as $layer) {
@@ -47,20 +42,24 @@ class Cache implements CacheLayerInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @throws EmptyKeyException
-     * @throws EmptyPoolException
      */
     public function set(string $key, $value, $ttl = 3600): void
     {
         if ('' === trim($key)) {
             throw new EmptyKeyException();
         }
-        if (empty($this->layers)) {
-            throw new EmptyPoolException();
-        }
+
+        $this->checkIsNotEmptyPool();
+
         foreach ($this->layers as $layer) {
             $layer->set($key, $value, $ttl);
+        }
+    }
+
+    private function checkIsNotEmptyPool()
+    {
+        if (empty($this->layers)) {
+            throw new EmptyPoolException();
         }
     }
 
