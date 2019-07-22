@@ -6,6 +6,7 @@ namespace App\Tests;
 
 use App\Exception\EmptyKeyException;
 use App\Exception\KeyNotFoundException;
+use App\Exception\OutdatedCacheException;
 use App\FileCache;
 use PHPUnit\Framework\TestCase;
 
@@ -57,6 +58,13 @@ class FileCacheTest extends TestCase
     public function testGetExistingKey()
     {
         $this->assertEquals('dog', $this->fileCache->get('cat'));
+    }
+
+    public function testGetOutdatedKey()
+    {
+        $this->expectException(OutdatedCacheException::class);
+        $this->fileCache->set('cat', 'dog', -1111);
+        $this->fileCache->get('cat');
     }
 
     public function testDeleteAllKeyCacheFiles()
