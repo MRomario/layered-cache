@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace App;
 
-use App\Exception\EmptyKeyException;
 use App\Exception\KeyNotFoundException;
 use App\Exception\OutdatedCacheException;
+use App\Traits\EmptyKeyExceptionTrait;
 
 class StaticCache implements CacheInterface
 {
+    use EmptyKeyExceptionTrait;
     /**
      * @var array
      */
@@ -24,9 +25,7 @@ class StaticCache implements CacheInterface
      */
     public function get(string $key)
     {
-        if ('' === trim($key)) {
-            throw new EmptyKeyException();
-        }
+        $this->checkIsEmptyKeyException($key);
 
         if (!array_key_exists($key, $this->data)) {
             throw  new KeyNotFoundException($key);
@@ -45,10 +44,7 @@ class StaticCache implements CacheInterface
      */
     public function set(string $key, $value, $ttl = 3600): void
     {
-        if ('' === trim($key)) {
-            throw new EmptyKeyException();
-        }
-
+        $this->checkIsEmptyKeyException($key);
         $this->ttl[$key] = microtime(true) + $ttl;
         $this->data[$key] = $value;
     }
