@@ -25,30 +25,27 @@ class CacheTest extends TestCase
 
     public function testGet()
     {
-        $cache = new Cache();
-        $staticCache = new StaticCache();
-        $cache->addLayer($staticCache);
+        $this->cache->addLayer($this->staticCache);
 
         $secondCache = new Cache();
         $secondStaticCache = new StaticCache();
         $secondCache->addLayer($secondStaticCache);
 
-        $cache->addLayer($secondCache);
+        $this->cache->addLayer($secondCache);
 
         $key = 'test';
         $value = 'test value';
-        $cache->set($key, $value);
+        $this->cache->set($key, $value);
 
-        $this->assertEquals($value, $cache->get($key));
-        $this->assertEquals($value, $staticCache->get($key));
+        $this->assertEquals($value, $this->cache->get($key));
+        $this->assertEquals($value, $this->staticCache->get($key));
         $this->assertEquals($value, $secondStaticCache->get($key));
     }
 
     public function testGetEmptyPoolException()
     {
         $this->expectException(EmptyPoolException::class);
-        $testKey = 'test';
-        $this->cache->get($testKey);
+        $this->cache->get('test');
     }
 
     public function testGetEmptyKeyException()
@@ -83,7 +80,12 @@ class CacheTest extends TestCase
 
     public function testAddLayer()
     {
-        $this->assertNull($this->cache->addLayer($this->staticCache));
+        try {
+            $this->cache->addLayer($this->staticCache);
+        } catch (InvalidArgumentException $notExpected) {
+            $this->fail();
+        }
+        $this->assertTrue(true);
     }
 
     public function testGetValueEmptyPool()
