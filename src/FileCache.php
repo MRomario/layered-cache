@@ -43,14 +43,6 @@ class FileCache implements CacheInterface
         touch($file, $timeLifeFile);
     }
 
-    public function deleteAllKeysCache(): void
-    {
-        $files = glob(sys_get_temp_dir().DIRECTORY_SEPARATOR.'*.cache');
-        foreach ($files as $file) {
-            (!is_file($file)) ?: unlink($file);
-        }
-    }
-
     /**
      * @param $key
      *
@@ -59,5 +51,13 @@ class FileCache implements CacheInterface
     private function getFile($key): string
     {
         return sys_get_temp_dir().DIRECTORY_SEPARATOR.md5($key).'.cache';
+    }
+
+    public function clear(): void
+    {
+        $files = glob(sys_get_temp_dir().DIRECTORY_SEPARATOR.'*.cache');
+        foreach ($files as $file) {
+            (!is_file($file)) ?: unlink($file);
+        }
     }
 }

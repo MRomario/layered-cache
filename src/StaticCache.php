@@ -48,4 +48,9 @@ class StaticCache implements CacheInterface
         $this->ttl[$key] = microtime(true) + $ttl;
         $this->data[$key] = $value;
     }
+
+    public function clear(): void
+    {
+        $this->data = [];
+    }
 }

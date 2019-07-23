@@ -65,4 +65,13 @@ class Cache implements CacheLayerInterface
             throw new EmptyPoolException();
         }
     }
+
+    public function clear(): void
+    {
+        $this->checkIsNotEmptyPool();
+
+        foreach ($this->layers as $layer) {
+            $this->layer->clear();
+        }
+    }
 }
