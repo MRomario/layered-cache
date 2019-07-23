@@ -9,6 +9,7 @@ use App\Exception\EmptyKeyException;
 use App\Exception\EmptyPoolException;
 use App\Exception\KeyNotFoundException;
 use App\Exception\OutdatedCacheException;
+use App\FileCache;
 use App\StaticCache;
 use PHPUnit\Framework\TestCase;
 
@@ -16,11 +17,13 @@ class CacheTest extends TestCase
 {
     private $cache;
     private $staticCache;
+    private $fileCache;
 
     public function setUp(): void
     {
         $this->cache = new Cache();
         $this->staticCache = new StaticCache();
+        $this->fileCache = new FileCache();
     }
 
     public function testGet()
@@ -89,5 +92,35 @@ class CacheTest extends TestCase
     {
         $this->expectException(EmptyPoolException::class);
         $this->cache->get('test');
+    }
+
+    public function testGetValueFromStaticLayerAndFileLayer()
+    {
+        $this->cache->addLayer($this->staticCache);
+        $this->cache->addLayer($this->fileCache);
+
+        $this->cache->set('cat', 'cat');
+        $this->cache->set('dog', 'dog');
+        $this->cache->set('car', 'car');
+
+        $this->assertEquals('cat', $this->fileCache->get('cat'));
+        $this->assertEquals('cat', $this->staticCache->get('cat'));
+        $this->assertEquals('cat', $this->cache->get('cat'));
+    }
+
+    public function testClearCacheFromAllLayers()
+    {
+        $this->expectException(KeyNotFoundException::class);
+
+        $this->cache->addLayer($this->staticCache);
+        $this->cache->addLayer($this->fileCache);
+
+        $this->cache->set('cat', 'cat');
+        $this->cache->set('dog', 'dog');
+        $this->cache->set('car', 'car');
+
+        $this->cache->clear();
+
+        $this->assertEquals('dog', $this->cache->get('dog'));
     }
 }

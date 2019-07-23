@@ -71,7 +71,7 @@ class Cache implements CacheLayerInterface
         $this->checkIsNotEmptyPool();
 
         foreach ($this->layers as $layer) {
-            $this->layer->clear();
+            $layer->clear();
         }
     }
 }

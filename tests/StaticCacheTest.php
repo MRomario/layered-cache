@@ -62,4 +62,12 @@ class StaticCacheTest extends TestCase
 
         $this->staticCache->set($testKey, $this->testValue);
     }
+
+    public function testClearCache()
+    {
+        $this->expectException(KeyNotFoundException::class);
+        $this->staticCache->set('cat', 'cat');
+        $this->staticCache->clear('cat');
+        $this->staticCache->get('cat');
+    }
 }
