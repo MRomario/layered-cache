@@ -19,16 +19,6 @@ class FileCacheTest extends TestCase
         $this->fileCache = new FileCache();
     }
 
-    public function testCreateObject()
-    {
-        try {
-            $fileCache = new FileCache();
-        } catch (InvalidArgumentException $e) {
-            $this->fail();
-        }
-        $this->assertTrue(true);
-    }
-
     public function testGetEmptyKey()
     {
         $this->expectException(EmptyKeyException::class);
@@ -44,15 +34,8 @@ class FileCacheTest extends TestCase
 
     public function testSetNewKey()
     {
-        try {
-            $this->fileCache->set('cat', 'dog');
-            $this->fileCache->set('color', 'green');
-            $this->fileCache->set('test', 'test');
-        } catch (InvalidArgumentException $e) {
-            $this->fail();
-        }
-
-        $this->assertTrue(true);
+        $this->fileCache->set('cat', 'dog');
+        $this->assertEquals('dog', $this->fileCache->get('cat'));
     }
 
     public function testGetExistingKey()
@@ -63,7 +46,7 @@ class FileCacheTest extends TestCase
     public function testGetOutdatedKey()
     {
         $this->expectException(OutdatedCacheException::class);
-        $this->fileCache->set('cat', 'dog', -1111);
+        $this->fileCache->set('cat', 'dog', -1000);
         $this->fileCache->get('cat');
     }
 

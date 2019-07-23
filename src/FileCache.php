@@ -11,121 +11,53 @@ class FileCache implements CacheInterface
     use EmptyKeyExceptionTrait;
 
     /**
-     * @var string
-     */
-    protected $cacheFolder;
-    protected $ttlFile;
-
-    /**
-     * FileCache constructor.
-     */
-    public function __construct()
-    {
-        $this->cacheFolder = __DIR__.DIRECTORY_SEPARATOR.'cache';
-        $this->ttlFile = __DIR__.DIRECTORY_SEPARATOR.'cache'.DIRECTORY_SEPARATOR.'ttl.txt';
-        $this->checkExistsCacheFolder();
-        $this->checkExistsTtlFile();
-    }
-
-    /**
-     * @param string $key
-     *
-     * @return mixed
-     *
      * {@inheritdoc}
      */
     public function get(string $key)
     {
         $this->checkIsEmptyKeyException($key);
 
-        $cacheKey = md5($key);
-        $keyFile = $this->cacheFolder.DIRECTORY_SEPARATOR.$cacheKey;
-
-        // if cache exists
-        if (!file_exists($keyFile)) {
+        $file = $this->getPathFile($key);
+        if (!file_exists($file)) {
             throw new KeyNotFoundException($key);
         }
 
-        // check ttl
-        $diffTtl = (microtime(true) - $this->getDataTtlFile()[$cacheKey]);
-
+        $diffTtl = microtime(true) - filemtime($file);
         if ($diffTtl >= 0) {
-            throw new OutdatedCacheException($cacheKey);
+            throw new OutdatedCacheException($key);
         }
 
-        return file_get_contents($keyFile);
+        return file_get_contents($file);
     }
 
     /**
-     * Set new key: create new cache file.
-     *
-     * @param string $key
-     * @param $value
-     * @param int $ttl
-     *                 {@inheritdoc}
+     * {@inheritdoc}
      */
     public function set(string $key, $value, $ttl = 3600): void
     {
         $this->checkIsEmptyKeyException($key);
 
-        $keyCache = md5($key);
-
-        $dataTtl = $this->getDataTtlFile();
-        $dataTtl[$keyCache] = microtime(true) + $ttl;
-        $this->setDataTtlFile($dataTtl);
-
-        $file = $this->cacheFolder.DIRECTORY_SEPARATOR.$keyCache;
+        $timeLifeFile = microtime(true) + $ttl;
+        $file = $this->getPathFile();
         file_put_contents($file, $value);
+        touch($file, $timeLifeFile);
     }
 
-    /**
-     * Deleted all keys from cache folder.
-     */
     public function deleteAllKeysCache(): void
     {
-        $files = glob($this->cacheFolder.DIRECTORY_SEPARATOR.'*');
+        $files = glob(sys_get_temp_dir().DIRECTORY_SEPARATOR.'*.cache');
         foreach ($files as $file) {
             (!is_file($file)) ?: unlink($file);
         }
     }
 
     /**
-     * Check existing folder fore cache files.
-     */
-    protected function checkExistsCacheFolder(): void
-    {
-        if (!file_exists($this->cacheFolder)) {
-            mkdir($this->cacheFolder, 0777, true);
-        }
-    }
-
-    /**
-     * Check existing ttl_file (serialize array).
-     */
-    protected function checkExistsTtlFile(): void
-    {
-        if (!file_exists($this->ttlFile)) {
-            $this->setDataTtlFile([]);
-        }
-    }
-
-    /**
-     * Save data to ttl file : serialize array.
+     * @param $key
      *
-     * @param array $data
+     * @return string
      */
-    protected function setDataTtlFile(array $data): void
+    private function getPathFile($key): string
     {
-        file_put_contents($this->ttlFile, serialize($data));
-    }
-
-    /**
-     * Get data from ttl file.
-     *
-     * @return array
-     */
-    protected function getDataTtlFile(): array
-    {
-        return unserialize(file_get_contents($this->ttlFile));
+        return sys_get_temp_dir().DIRECTORY_SEPARATOR.md5($key).'.cache';
     }
 }
