@@ -18,8 +18,9 @@ build:
             coverage:
               file: my-coverage-file
               format: php-clover
+
 build_failure_conditions:
-    - 'elements.rating(<= C).new.exists'
-    - 'issues.label("coding-style").new.exists'
-    - 'issues.severity(>= MAJOR).new.exists'
-    - 'project.metric_change("scrutinizer.test_coverage", < 0)'
+  - 'elements.rating(<= C).new.exists'
+  - 'issues.label("coding-style").new.exists'
+  - 'issues.severity(>= MAJOR).new.exists'
+  - 'project.metric_change("scrutinizer.test_coverage", < 0)'
