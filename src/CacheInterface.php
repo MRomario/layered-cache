@@ -13,11 +13,11 @@ interface CacheInterface
     /**
      * @param string $key
      *
-     * @throws KeyNotFoundException;
+     * @return mixed
+     *
      * @throws OutdatedCacheException;
      * @throws EmptyKeyException
-     *
-     * @return mixed
+     * @throws KeyNotFoundException;
      */
     public function get(string $key);
 
@@ -26,9 +26,11 @@ interface CacheInterface
      * @param $value
      * @param int $ttl
      *
-     * @throws EmptyKeyException
-     *
      * @return mixed
+     *
+     * @throws EmptyKeyException
      */
     public function set(string $key, $value, $ttl = 3600);
+
+    public function clear();
 }
