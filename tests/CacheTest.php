@@ -80,12 +80,9 @@ class CacheTest extends TestCase
 
     public function testAddLayer()
     {
-        try {
-            $this->cache->addLayer($this->staticCache);
-        } catch (InvalidArgumentException $notExpected) {
-            $this->fail();
-        }
-        $this->assertTrue(true);
+        $this->cache->addLayer($this->staticCache);
+        $this->cache->set('cat', 'dog');
+        $this->assertEquals('dog', $this->cache->get('cat'));
     }
 
     public function testGetValueEmptyPool()

@@ -3,12 +3,13 @@
 namespace App;
 
 use App\Exception\KeyNotFoundException;
-use App\Exception\OutdatedCacheException;
 use App\Traits\EmptyKeyExceptionTrait;
+use App\Traits\OutdatedCacheExceptionTrait;
 
 class FileCache implements CacheInterface
 {
     use EmptyKeyExceptionTrait;
+    use OutdatedCacheExceptionTrait;
 
     /**
      * {@inheritdoc}
@@ -17,15 +18,14 @@ class FileCache implements CacheInterface
     {
         $this->checkIsEmptyKeyException($key);
 
-        $file = $this->getPathFile($key);
+        $file = $this->getFile($key);
         if (!file_exists($file)) {
             throw new KeyNotFoundException($key);
         }
 
         $diffTtl = microtime(true) - filemtime($file);
-        if ($diffTtl >= 0) {
-            throw new OutdatedCacheException($key);
-        }
+
+        $this->checkOutdatedCacheKey($key, $diffTtl);
 
         return file_get_contents($file);
     }
@@ -38,7 +38,7 @@ class FileCache implements CacheInterface
         $this->checkIsEmptyKeyException($key);
 
         $timeLifeFile = microtime(true) + $ttl;
-        $file = $this->getPathFile();
+        $file = $this->getFile($key);
         file_put_contents($file, $value);
         touch($file, $timeLifeFile);
     }
@@ -56,7 +56,7 @@ class FileCache implements CacheInterface
      *
      * @return string
      */
-    private function getPathFile($key): string
+    private function getFile($key): string
     {
         return sys_get_temp_dir().DIRECTORY_SEPARATOR.md5($key).'.cache';
     }

@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace App;
 
 use App\Exception\KeyNotFoundException;
-use App\Exception\OutdatedCacheException;
 use App\Traits\EmptyKeyExceptionTrait;
+use App\Traits\OutdatedCacheExceptionTrait;
 
 class StaticCache implements CacheInterface
 {
     use EmptyKeyExceptionTrait;
+    use OutdatedCacheExceptionTrait;
     /**
      * @var array
      */
@@ -32,9 +33,8 @@ class StaticCache implements CacheInterface
         }
 
         $diffTtl = (microtime(true) - $this->ttl[$key]);
-        if ($diffTtl >= 0) {
-            throw new OutdatedCacheException($key, $diffTtl);
-        }
+
+        $this->checkOutdatedCacheKey($key, $diffTtl);
 
         return $this->data[$key];
     }

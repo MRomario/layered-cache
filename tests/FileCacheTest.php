@@ -8,6 +8,7 @@ use App\Exception\EmptyKeyException;
 use App\Exception\KeyNotFoundException;
 use App\Exception\OutdatedCacheException;
 use App\FileCache;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 class FileCacheTest extends TestCase
@@ -40,6 +41,7 @@ class FileCacheTest extends TestCase
 
     public function testGetExistingKey()
     {
+        $this->fileCache->set('cat', 'dog');
         $this->assertEquals('dog', $this->fileCache->get('cat'));
     }
 
@@ -53,6 +55,9 @@ class FileCacheTest extends TestCase
     public function testDeleteAllKeyCacheFiles()
     {
         try {
+            $this->fileCache->set('c', 'd');
+            $this->fileCache->set('ca', 'do');
+            $this->fileCache->set('cat', 'dog');
             $this->fileCache->deleteAllKeysCache();
         } catch (InvalidArgumentException $e) {
             $this->fail();
