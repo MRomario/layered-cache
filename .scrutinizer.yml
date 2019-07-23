@@ -6,7 +6,7 @@ checks:
 build_failure_conditions:
     - 'elements.rating(<= B).exists'               # No classes/methods with a rating of D or worse
     - 'elements.rating(<= B).new.exists'           # No new classes/methods with a rating of D or worse
-    # allowed (useful for legacy code)
+                                                   # allowed (useful for legacy code)
     - 'patches.label("Doc Comments").exists'       # No doc comments patches allowed
     - 'patches.label("Spacing").new.count > 1'     # More than 1 new spacing patch
     - 'issues.label("coding-style").exists'        # No coding style issues allowed
@@ -18,11 +18,15 @@ build_failure_conditions:
 build:
   nodes:
     analysis:
-#      requires:
-#       - is_pull_request: true
-      project_setup:
-        override: true
       tests:
         override:
-          - command: php-scrutinizer-run
-          - phpcs-run --standard=build/phpcs.xml
+          - php-scrutinizer-run
+          - phpcs-run ./
+
+    my-tests-with-coverage:
+      tests:
+        override:
+          - command: phpunit --coverage-clover=my-coverage-file
+            coverage:
+              file: my-coverage-file
+              format: php-clover
