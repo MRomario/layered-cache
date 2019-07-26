@@ -71,7 +71,19 @@ class StaticCacheTest extends TestCase
         $this->staticCache->get('cat');
     }
 
-    public function testLimitCache()
+    public function testLimitCacheFive()
+    {
+        // limit 5 keys
+        $this->staticCache->set('1', 1, 100);
+        $this->staticCache->set('2', 2, 200);
+        $this->staticCache->set('3', 3, 300);
+        $this->staticCache->set('4', 4, 400);
+        $this->staticCache->set('5', 5, 500);
+
+        $this->assertEquals(1, $this->staticCache->get('1'));
+    }
+
+    public function testLimitCacheSix()
     {
         $this->expectException(KeyNotFoundException::class);
         // limit 5 keys
