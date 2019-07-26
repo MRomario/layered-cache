@@ -26,7 +26,7 @@ class CacheTest extends TestCase
         $this->fileCache = new FileCache();
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         $this->cache->addLayer($this->staticCache);
 
@@ -45,13 +45,13 @@ class CacheTest extends TestCase
         $this->assertEquals($value, $secondStaticCache->get($key));
     }
 
-    public function testGetEmptyPoolException()
+    public function testGetEmptyPoolException(): void
     {
         $this->expectException(EmptyPoolException::class);
         $this->cache->get('test');
     }
 
-    public function testGetEmptyKeyException()
+    public function testGetEmptyKeyException(): void
     {
         $this->expectException(EmptyKeyException::class);
         $this->cache->addLayer($this->staticCache);
@@ -59,7 +59,7 @@ class CacheTest extends TestCase
         $this->cache->get(' ');
     }
 
-    public function testGetKeyNotFoundException()
+    public function testGetKeyNotFoundException(): void
     {
         $this->expectException(KeyNotFoundException::class);
         $this->cache->addLayer($this->staticCache);
@@ -67,7 +67,7 @@ class CacheTest extends TestCase
         $this->cache->get('not found key');
     }
 
-    public function testGetIssetKeyButOutdated()
+    public function testGetIssetKeyButOutdated(): void
     {
         $this->expectException(OutdatedCacheException::class);
         $this->cache->addLayer($this->staticCache);
@@ -75,13 +75,13 @@ class CacheTest extends TestCase
         $this->cache->get('cat');
     }
 
-    public function testSetKeyValue()
+    public function testSetKeyValue(): void
     {
         $this->cache->addLayer($this->staticCache);
         $this->assertNull($this->cache->set('cat', 'dog'));
     }
 
-    public function testAddLayer()
+    public function testAddLayer(): void
     {
         $this->cache->addLayer($this->staticCache);
         $this->cache->set('cat', 'dog');
@@ -94,7 +94,7 @@ class CacheTest extends TestCase
         $this->cache->get('test');
     }
 
-    public function testGetValueFromStaticLayerAndFileLayer()
+    public function testGetValueFromStaticLayerAndFileLayer(): void
     {
         $this->cache->addLayer($this->staticCache);
         $this->cache->addLayer($this->fileCache);
@@ -108,7 +108,25 @@ class CacheTest extends TestCase
         $this->assertEquals('cat', $this->cache->get('cat'));
     }
 
-    public function testClearCacheFromAllLayers()
+    public function testLimitCacheFromAllLayers(): void
+    {
+        $this->expectException(KeyNotFoundException::class);
+
+        $this->cache->addLayer($this->staticCache);
+        $this->cache->addLayer($this->fileCache);
+
+        $this->cache->set('1', 1, -1000);
+        $this->cache->set('2', 2);
+        $this->cache->set('3', 3);
+        $this->cache->set('4', 4);
+        $this->cache->set('5', 5);
+        $this->cache->set('6', 6);
+
+        $this->assertEquals(6, $this->cache->get('6'));
+        $this->assertEquals(1, $this->cache->get('1'));
+    }
+
+    public function testClearCacheFromAllLayers(): void
     {
         $this->expectException(KeyNotFoundException::class);
 

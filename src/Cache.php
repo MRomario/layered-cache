@@ -41,7 +41,7 @@ class Cache implements CacheLayerInterface
     /**
      * {@inheritdoc}
      */
-    public function set(string $key, $value, $ttl = 3600): void
+    public function set(string $key, $value, $ttl = 3600, $limitCache = 5): void
     {
         $this->checkIsEmptyKeyException($key);
         $this->checkIsNotEmptyPool();
@@ -59,7 +59,7 @@ class Cache implements CacheLayerInterface
         $this->layers[] = $layer;
     }
 
-    private function checkIsNotEmptyPool()
+    private function checkIsNotEmptyPool(): void
     {
         if (empty($this->layers)) {
             throw new EmptyPoolException();

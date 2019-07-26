@@ -46,7 +46,7 @@ class StaticCache implements CacheInterface
     {
         $this->checkIsEmptyKeyException($key);
 
-        if (count($this->ttl) >= $limitCache) {
+        if (count($this->data) >= $limitCache) {
             $limitKey = array_keys($this->ttl, min($this->ttl));
             unset($this->ttl[$limitKey[0]], $this->data[$limitKey[0]]);
         }
