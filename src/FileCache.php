@@ -33,7 +33,7 @@ class FileCache implements CacheInterface
     /**
      * {@inheritdoc}
      */
-    public function set(string $key, $value, $ttl = 3600): void
+    public function set(string $key, $value, $ttl = 3600, $limitCache = 5): void
     {
         $this->checkIsEmptyKeyException($key);
 

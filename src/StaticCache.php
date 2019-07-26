@@ -42,9 +42,15 @@ class StaticCache implements CacheInterface
     /**
      * {@inheritdoc}
      */
-    public function set(string $key, $value, $ttl = 3600): void
+    public function set(string $key, $value, $ttl = 3600, $limitCache = 5): void
     {
         $this->checkIsEmptyKeyException($key);
+
+        if (count($this->ttl) > $limitCache) {
+            $limitKey = array_keys($this->ttl, min($this->ttl));
+            unset($this->ttl[$limitKey[0]], $this->data[$limitKey[0]]);
+        }
+
         $this->ttl[$key] = microtime(true) + $ttl;
         $this->data[$key] = $value;
     }
