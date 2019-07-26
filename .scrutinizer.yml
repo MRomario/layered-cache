@@ -22,8 +22,7 @@ build:
         override: true
       tests:
         override:
-          -
-            command: php-scrutinizer-run
+          - php-scrutinizer-run
           - phpcs-run --standard=phpcs.xml
           - command: composer test:coverage
             coverage:
