@@ -25,11 +25,7 @@ build:
           -
             command: php-scrutinizer-run
           - phpcs-run --standard=phpcs.xml
-
-  coverage:
-    tests:
-      override:
-        - command: composer test
-          coverage:
-            file: logs/clover.xml
-            format: clover
+          - command: composer test
+            coverage:
+              file: logs/clover.xml
+              format: clover
