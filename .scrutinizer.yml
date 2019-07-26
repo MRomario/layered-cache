@@ -1,0 +1,26 @@
+checks:
+  php:
+    code_rating: true
+    duplication: true
+
+build:
+  nodes:
+    analysis:
+      tests:
+        override:
+          - php-scrutinizer-run
+          - phpcs-run ./
+
+    my-tests-with-coverage:
+      tests:
+        override:
+          - command: phpunit --coverage-clover=my-coverage-file
+            coverage:
+              file: my-coverage-file
+              format: php-clover
+
+build_failure_conditions:
+  - 'elements.rating(<= C).new.exists'
+  - 'issues.label("coding-style").new.exists'
+  - 'issues.severity(>= MAJOR).new.exists'
+  - 'project.metric_change("scrutinizer.test_coverage", < 0)'
