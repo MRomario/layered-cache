@@ -32,6 +32,12 @@
     }
   },
   "scripts": {
+    "test": [
+      "vendor/bin/phpunit --testdox"
+    ],
+    "test:coverage": [
+      "vendor/bin/phpunit --testdox --coverage-clover=logs/clover.xml"
+    ],
     "cghooks": "cghooks",
     "cghooks:update": "cghooks update",
     "post-install-cmd": "cghooks add --ignore-lock",
