@@ -37,19 +37,19 @@ class FileCache implements CacheInterface
     {
         $this->checkIsEmptyKeyException($key);
 
-        $allCacheFiles = glob(sys_get_temp_dir().DIRECTORY_SEPARATOR.'*.cache');
+        $allCacheFiles = $this->getAllCacheFiles();
+
         if (count($allCacheFiles) >= $limitCache) {
+            $tempArray = [];
             foreach ($allCacheFiles as $fileCheck) {
                 $tempArray[$fileCheck] = filemtime($fileCheck);
             }
-            $limitKey = array_keys($tempArray, min($tempArray));
-            unlink($limitKey[0]);
+            unlink(array_keys($tempArray, min($tempArray))[0]);
         }
 
-        $timeLifeFile = microtime(true) + $ttl;
         $file = $this->getFile($key);
         file_put_contents($file, $value, LOCK_EX);
-        touch($file, $timeLifeFile);
+        touch($file, microtime(true) + $ttl);
     }
 
     /**
@@ -62,10 +62,17 @@ class FileCache implements CacheInterface
         return sys_get_temp_dir().DIRECTORY_SEPARATOR.md5($key).'.cache';
     }
 
+    /**
+     * @return array
+     */
+    private function getAllCacheFiles(): array
+    {
+        return glob(sys_get_temp_dir().DIRECTORY_SEPARATOR.'*.cache');
+    }
+
     public function clear(): void
     {
-        $files = glob(sys_get_temp_dir().DIRECTORY_SEPARATOR.'*.cache');
-        foreach ($files as $file) {
+        foreach ($this->getAllCacheFiles() as $file) {
             (!is_file($file)) ?: unlink($file);
         }
     }
