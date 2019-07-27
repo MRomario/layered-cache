@@ -6,7 +6,7 @@ use App\Exception\KeyNotFoundException;
 use App\Traits\EmptyKeyExceptionTrait;
 use App\Traits\OutdatedCacheExceptionTrait;
 
-class FileCache implements CacheInterface
+class FileCache implements CacheInterface, LimitedSizeInterface
 {
     use EmptyKeyExceptionTrait;
     use OutdatedCacheExceptionTrait;
@@ -50,6 +50,14 @@ class FileCache implements CacheInterface
         $file = $this->getFile($key);
         file_put_contents($file, $value, LOCK_EX);
         touch($file, microtime(true) + $ttl);
+    }
+
+    /**
+     * @param int $size
+     */
+    public function setSize(int $size): void
+    {
+        // TODO: Implement setSize() method.
     }
 
     /**

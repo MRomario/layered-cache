@@ -8,7 +8,7 @@ use App\Exception\KeyNotFoundException;
 use App\Traits\EmptyKeyExceptionTrait;
 use App\Traits\OutdatedCacheExceptionTrait;
 
-class StaticCache implements CacheInterface
+class StaticCache implements CacheInterface, LimitedSizeInterface
 {
     use EmptyKeyExceptionTrait;
     use OutdatedCacheExceptionTrait;
@@ -53,6 +53,14 @@ class StaticCache implements CacheInterface
 
         $this->ttl[$key] = microtime(true) + $ttl;
         $this->data[$key] = $value;
+    }
+
+    /**
+     * @param int $size
+     */
+    public function setSize(int $size): void
+    {
+        // TODO: Implement setSize() method.
     }
 
     public function clear(): void
