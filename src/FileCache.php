@@ -67,7 +67,9 @@ class FileCache implements CacheInterface
      */
     private function getAllCacheFiles(): array
     {
-        return glob(sys_get_temp_dir().DIRECTORY_SEPARATOR.'*.cache');
+        $allFiles = glob(sys_get_temp_dir().DIRECTORY_SEPARATOR.'*.cache');
+
+        return ($allFiles) ? $allFiles : [];
     }
 
     public function clear(): void
