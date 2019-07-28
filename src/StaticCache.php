@@ -62,7 +62,7 @@ class StaticCache implements CacheInterface, LimitedSizeInterface
      */
     public function setSize(int $size): void
     {
-        $this->size = $size;
+        $this->limitSize = $size;
     }
 
     public function clear(): void
