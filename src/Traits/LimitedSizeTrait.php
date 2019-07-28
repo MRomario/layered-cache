@@ -4,13 +4,20 @@ namespace App\Traits;
 
 trait LimitedSizeTrait
 {
-    private $limitSize;
+    private $limitSize = 5;
 
     /**
-     * @param int $limitSize
+     * @param $property
+     * @param $value
+     *
+     * @return $this
      */
-    public function __set(int $limitSize)
+    public function __set($property, $value)
     {
-        $this->limitSize = $limitSize;
+        if (property_exists($this, $property)) {
+            $this->$property = $value;
+        }
+
+        return $this;
     }
 }

@@ -4,12 +4,14 @@ namespace App;
 
 use App\Exception\KeyNotFoundException;
 use App\Traits\EmptyKeyExceptionTrait;
+use App\Traits\LimitedSizeTrait;
 use App\Traits\OutdatedCacheExceptionTrait;
 
 class FileCache implements CacheInterface, LimitedSizeInterface
 {
     use EmptyKeyExceptionTrait;
     use OutdatedCacheExceptionTrait;
+    use LimitedSizeTrait;
 
     /**
      * {@inheritdoc}
@@ -33,13 +35,13 @@ class FileCache implements CacheInterface, LimitedSizeInterface
     /**
      * {@inheritdoc}
      */
-    public function set(string $key, $value, $ttl = 3600, $limitCache = 5): void
+    public function set(string $key, $value, $ttl = 3600): void
     {
         $this->checkIsEmptyKeyException($key);
 
         $allCacheFiles = $this->getAllCacheFiles();
 
-        if (count($allCacheFiles) >= $limitCache) {
+        if (count($allCacheFiles) >= $this->limitSize) {
             $tempArray = [];
             foreach ($allCacheFiles as $fileCheck) {
                 $tempArray[$fileCheck] = filemtime($fileCheck);
@@ -53,11 +55,11 @@ class FileCache implements CacheInterface, LimitedSizeInterface
     }
 
     /**
-     * @param int $size
+     * {@inheritdoc}
      */
     public function setSize(int $size): void
     {
-        // TODO: Implement setSize() method.
+        $this->limitSize = $size;
     }
 
     /**

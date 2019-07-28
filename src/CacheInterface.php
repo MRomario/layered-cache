@@ -29,7 +29,7 @@ interface CacheInterface
      *
      * @return mixed
      */
-    public function set(string $key, $value, $ttl = 3600, $limitCache = 5);
+    public function set(string $key, $value, $ttl = 3600);
 
     public function clear();
 }

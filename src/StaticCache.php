@@ -6,12 +6,14 @@ namespace App;
 
 use App\Exception\KeyNotFoundException;
 use App\Traits\EmptyKeyExceptionTrait;
+use App\Traits\LimitedSizeTrait;
 use App\Traits\OutdatedCacheExceptionTrait;
 
 class StaticCache implements CacheInterface, LimitedSizeInterface
 {
     use EmptyKeyExceptionTrait;
     use OutdatedCacheExceptionTrait;
+    use LimitedSizeTrait;
     /**
      * @var array
      */
@@ -42,11 +44,11 @@ class StaticCache implements CacheInterface, LimitedSizeInterface
     /**
      * {@inheritdoc}
      */
-    public function set(string $key, $value, $ttl = 3600, $limitCache = 5): void
+    public function set(string $key, $value, $ttl = 3600): void
     {
         $this->checkIsEmptyKeyException($key);
 
-        if (count($this->data) >= $limitCache) {
+        if (count($this->data) >= $this->limitSize) {
             $limitKey = array_keys($this->ttl, min($this->ttl));
             unset($this->ttl[$limitKey[0]], $this->data[$limitKey[0]]);
         }
@@ -56,11 +58,11 @@ class StaticCache implements CacheInterface, LimitedSizeInterface
     }
 
     /**
-     * @param int $size
+     * {@inheritdoc}
      */
     public function setSize(int $size): void
     {
-        // TODO: Implement setSize() method.
+        $this->size = $size;
     }
 
     public function clear(): void
