@@ -2,3 +2,4 @@
 /vendor
 cghooks.lock
 .phpunit.result.cache
+.php_cs.cache
