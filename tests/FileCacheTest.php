@@ -30,18 +30,21 @@ class FileCacheTest extends TestCase
     {
         $this->expectException(KeyNotFoundException::class);
         $this->fileCache->get('not existing key');
+        $this->fileCache->clear();
     }
 
     public function testSetNewKey(): void
     {
         $this->fileCache->set('cat', 'dog');
         $this->assertEquals('dog', $this->fileCache->get('cat'));
+        $this->fileCache->clear();
     }
 
     public function testGetExistingKey(): void
     {
         $this->fileCache->set('cat', 'dog');
         $this->assertEquals('dog', $this->fileCache->get('cat'));
+        $this->fileCache->clear();
     }
 
     public function testLimitKeyCacheFour(): void
@@ -54,6 +57,7 @@ class FileCacheTest extends TestCase
         $this->fileCache->set('5', 5);
 
         $this->assertEquals(5, $this->fileCache->get('5'));
+        $this->fileCache->clear();
     }
 
     public function testLimitKeyCacheFive(): void
@@ -68,6 +72,7 @@ class FileCacheTest extends TestCase
         $this->fileCache->set('6', 6);
 
         $this->assertEquals(1, $this->fileCache->get('1'));
+        $this->fileCache->clear();
     }
 
     public function testGetOutdatedKey(): void
@@ -75,6 +80,7 @@ class FileCacheTest extends TestCase
         $this->expectException(OutdatedCacheException::class);
         $this->fileCache->set('cat', 'dog', -1000);
         $this->fileCache->get('cat');
+        $this->fileCache->clear();
     }
 
     public function testClearCache(): void
@@ -84,5 +90,20 @@ class FileCacheTest extends TestCase
         $this->fileCache->clear();
 
         $this->assertEquals('cat', $this->fileCache->get('cat'));
+        $this->fileCache->clear();
+    }
+
+    public function testSetLimitSizeCache(): void
+    {
+        $this->expectException(KeyNotFoundException::class);
+
+        $this->fileCache->setSize(2);
+
+        $this->fileCache->set('1', 1, -1000);
+        $this->fileCache->set('2', 2);
+        $this->fileCache->set('3', 3);
+
+        $this->assertEquals(1, $this->fileCache->get('1'));
+        $this->fileCache->clear();
     }
 }

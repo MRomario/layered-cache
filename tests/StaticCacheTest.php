@@ -74,7 +74,7 @@ class StaticCacheTest extends TestCase
         $this->staticCache->set('5', 5);
         $this->staticCache->set('6', 6);
 
-        $this->assertEquals(2, $this->staticCache->get('1'));
+        $this->assertEquals(1, $this->staticCache->get('1'));
     }
 
     public function testClearCache(): void
@@ -83,5 +83,17 @@ class StaticCacheTest extends TestCase
         $this->staticCache->set('cat', 'cat');
         $this->staticCache->clear('cat');
         $this->staticCache->get('cat');
+    }
+
+    public function testSetLimitSizeCache(): void
+    {
+        $this->expectException(KeyNotFoundException::class);
+
+        $this->staticCache->setSize(2);
+        $this->staticCache->set('1', 1, -1000);
+        $this->staticCache->set('2', 2);
+        $this->staticCache->set('3', 3);
+
+        $this->assertEquals(1, $this->staticCache->get('1'));
     }
 }

@@ -141,4 +141,20 @@ class CacheTest extends TestCase
 
         $this->assertEquals('dog', $this->cache->get('dog'));
     }
+
+    public function testSetLimitSizeCache(): void
+    {
+        $this->expectException(KeyNotFoundException::class);
+
+        $this->staticCache->setSize(2);
+
+        $this->cache->addLayer($this->staticCache);
+
+        $this->cache->set('1', 1, -1000);
+        $this->cache->set('2', 2);
+        $this->cache->set('3', 3);
+
+        $this->assertEquals(1, $this->staticCache->get('1'));
+        $this->cache->clear();
+    }
 }
