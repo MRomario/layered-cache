@@ -16,7 +16,14 @@ class FileCacheTest extends TestCase
 
     public function setUp(): void
     {
+        parent::setUp();
         $this->fileCache = new FileCache();
+    }
+
+    public function tearDown(): void
+    {
+        parent::tearDown();
+        $this->fileCache->clear();
     }
 
     public function testGetEmptyKey(): void
@@ -30,80 +37,55 @@ class FileCacheTest extends TestCase
     {
         $this->expectException(KeyNotFoundException::class);
         $this->fileCache->get('not existing key');
-        $this->fileCache->clear();
     }
 
     public function testSetNewKey(): void
     {
-        $this->fileCache->set('cat', 'dog');
-        $this->assertEquals('dog', $this->fileCache->get('cat'));
-        $this->fileCache->clear();
+        $this->fileCache->set('1', 1);
+        $this->assertEquals(1, $this->fileCache->get('1'));
     }
 
     public function testGetExistingKey(): void
     {
-        $this->fileCache->set('cat', 'dog');
-        $this->assertEquals('dog', $this->fileCache->get('cat'));
-        $this->fileCache->clear();
-    }
-
-    public function testLimitKeyCacheFour(): void
-    {
-        // limit 5 - 4 keys
         $this->fileCache->set('1', 1);
-        $this->fileCache->set('2', 2);
-        $this->fileCache->set('3', 3);
-        $this->fileCache->set('4', 4);
-        $this->fileCache->set('5', 5);
-
-        $this->assertEquals(5, $this->fileCache->get('5'));
-        $this->fileCache->clear();
-    }
-
-    public function testLimitKeyCacheFive(): void
-    {
-        $this->expectException(KeyNotFoundException::class);
-
-        $this->fileCache->set('1', 1, -1000);
-        $this->fileCache->set('2', 2);
-        $this->fileCache->set('3', 3);
-        $this->fileCache->set('4', 4);
-        $this->fileCache->set('5', 5);
-        $this->fileCache->set('6', 6);
-
         $this->assertEquals(1, $this->fileCache->get('1'));
-        $this->fileCache->clear();
     }
 
     public function testGetOutdatedKey(): void
     {
         $this->expectException(OutdatedCacheException::class);
-        $this->fileCache->set('cat', 'dog', -1000);
-        $this->fileCache->get('cat');
-        $this->fileCache->clear();
+        $this->fileCache->set('1', 1, -1000);
+        $this->fileCache->get('1');
+    }
+
+    public function testLimitKeyCacheTrue(): void
+    {
+        $this->fileCache->setSize(4);
+        for ($i = 1; $i <= 4; ++$i) {
+            $this->fileCache->set("$i", $i);
+        }
+        $this->assertEquals(4, $this->fileCache->get('4'));
+    }
+
+    public function testLimitKeyCacheFalse(): void
+    {
+        $this->expectException(KeyNotFoundException::class);
+
+        $this->fileCache->setSize(2);
+        for ($i = 1; $i <= 3; ++$i) {
+            if (1 === $i) {
+                $this->fileCache->set('1', 1, -3600);
+            }
+            $this->fileCache->set("$i", $i);
+        }
+        $this->assertEquals(1, $this->fileCache->get('1'));
     }
 
     public function testClearCache(): void
     {
         $this->expectException(KeyNotFoundException::class);
-        $this->fileCache->set('cat', 'cat');
+        $this->fileCache->set('1', 1);
         $this->fileCache->clear();
-
-        $this->assertEquals('cat', $this->fileCache->get('cat'));
-        $this->fileCache->clear();
-    }
-
-    public function testSetLimitSizeCache(): void
-    {
-        $this->expectException(KeyNotFoundException::class);
-
-        $this->fileCache->setSize(2);
-
-        $this->fileCache->set('1', 1, -1000);
-        $this->fileCache->set('2', 2);
-        $this->fileCache->set('3', 3);
-
-        $this->assertEquals(1, $this->fileCache->get('1'));
-        $this->fileCache->clear();
+        $this->assertEquals(2, $this->fileCache->get('2'));
     }
 }

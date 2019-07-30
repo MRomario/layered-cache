@@ -6,18 +6,8 @@ trait LimitedSizeTrait
 {
     private $limitSize = 5;
 
-    /**
-     * @param $property
-     * @param $value
-     *
-     * @return $this
-     */
-    public function __set($property, $value)
+    public function setSize(int $size): void
     {
-        if (property_exists($this, $property)) {
-            $this->$property = $value;
-        }
-
-        return $this;
+        $this->limitSize = $size;
     }
 }

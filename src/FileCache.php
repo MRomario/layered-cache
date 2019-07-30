@@ -51,15 +51,7 @@ class FileCache implements CacheInterface, LimitedSizeInterface
 
         $file = $this->getFile($key);
         file_put_contents($file, $value, LOCK_EX);
-        touch($file, microtime(true) + $ttl);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setSize(int $size): void
-    {
-        $this->limitSize = $size;
+        touch($file, ($ttl + microtime(true)));
     }
 
     /**
@@ -79,13 +71,15 @@ class FileCache implements CacheInterface, LimitedSizeInterface
     {
         $allFiles = glob(sys_get_temp_dir().DIRECTORY_SEPARATOR.'*.cache');
 
-        return ($allFiles) ? $allFiles : [];
+        return $allFiles ? $allFiles : [];
     }
 
     public function clear(): void
     {
         foreach ($this->getAllCacheFiles() as $file) {
-            (!is_file($file)) ?: unlink($file);
+            if (is_file($file)) {
+                unlink($file);
+            }
         }
     }
 }

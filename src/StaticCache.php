@@ -57,14 +57,6 @@ class StaticCache implements CacheInterface, LimitedSizeInterface
         $this->data[$key] = $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setSize(int $size): void
-    {
-        $this->limitSize = $size;
-    }
-
     public function clear(): void
     {
         $this->data = [];

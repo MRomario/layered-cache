@@ -25,11 +25,8 @@ interface CacheInterface
      * @param string $key
      * @param $value
      * @param int $ttl
-     * @param int $limitCache;
-     *
-     * @return mixed
      */
-    public function set(string $key, $value, $ttl = 3600);
+    public function set(string $key, $value, $ttl = 3600): void;
 
     public function clear();
 }
