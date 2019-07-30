@@ -4,9 +4,9 @@ namespace App\Traits;
 
 trait LimitedSizeTrait
 {
-    private $limitSize = 5;
+    private $limitSize;
 
-    public function setSize(int $size = null): void
+    public function setSize(int $size = 5): void
     {
         if ($size) {
             $this->limitSize = $size;

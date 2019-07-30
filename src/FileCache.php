@@ -16,9 +16,9 @@ class FileCache implements CacheInterface, LimitedSizeInterface
     /**
      * FileCache constructor.
      *
-     * @param null $size
+     * @param int $size
      */
-    public function __construct($size = null)
+    public function __construct(int $size = 5)
     {
         $this->setSize($size);
     }
