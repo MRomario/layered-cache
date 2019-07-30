@@ -6,8 +6,10 @@ trait LimitedSizeTrait
 {
     private $limitSize = 5;
 
-    public function setSize(int $size): void
+    public function setSize(int $size = null): void
     {
-        $this->limitSize = $size;
+        if ($size) {
+            $this->limitSize = $size;
+        }
     }
 }

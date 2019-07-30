@@ -23,6 +23,11 @@ class StaticCache implements CacheInterface, LimitedSizeInterface
      */
     protected $ttl = [];
 
+    public function __construct($size = null)
+    {
+        $this->setSize($size);
+    }
+
     /**
      * {@inheritdoc}
      */

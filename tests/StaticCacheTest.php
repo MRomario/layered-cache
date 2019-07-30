@@ -96,4 +96,18 @@ class StaticCacheTest extends TestCase
         }
         $this->assertEquals(1, $this->staticCache->get('1'));
     }
+
+    public function testConstructorLimitCacheSize(): void
+    {
+        $this->expectException(KeyNotFoundException::class);
+
+        $staticCache = new StaticCache(2);
+        for ($i = 1; $i <= 3; ++$i) {
+            if (1 === $i) {
+                $staticCache->set('1', 1, -1000);
+            }
+            $staticCache->set("$i", $i);
+        }
+        $this->assertEquals(1, $staticCache->get('1'));
+    }
 }

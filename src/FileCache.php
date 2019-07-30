@@ -14,6 +14,16 @@ class FileCache implements CacheInterface, LimitedSizeInterface
     use LimitedSizeTrait;
 
     /**
+     * FileCache constructor.
+     *
+     * @param null $size
+     */
+    public function __construct($size = null)
+    {
+        $this->setSize($size);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function get(string $key)

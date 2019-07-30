@@ -88,4 +88,18 @@ class FileCacheTest extends TestCase
         $this->fileCache->clear();
         $this->assertEquals(2, $this->fileCache->get('2'));
     }
+
+    public function testConstructorLimitCacheSize(): void
+    {
+        $this->expectException(KeyNotFoundException::class);
+
+        $fileCache = new FileCache(2);
+        for ($i = 1; $i <= 3; ++$i) {
+            if (1 === $i) {
+                $fileCache->set('1', 1, -1000);
+            }
+            $fileCache->set("$i", $i);
+        }
+        $this->assertEquals(1, $fileCache->get('1'));
+    }
 }

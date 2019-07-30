@@ -148,4 +148,20 @@ class CacheTest extends TestCase
         $this->cache->clear();
         $this->assertEquals(1, $this->cache->get('1'));
     }
+
+    public function testConstructorLimitCacheSizeLayers(): void
+    {
+        $this->expectException(KeyNotFoundException::class);
+
+        $this->cache->addLayer(new StaticCache(2));
+        $this->cache->addLayer(new FileCache(2));
+
+        for ($i = 1; $i <= 3; ++$i) {
+            if (1 === $i) {
+                $this->cache->set('1', 1, -1000);
+            }
+            $this->cache->set("$i", $i);
+        }
+        $this->assertEquals(1, $this->cache->get('1'));
+    }
 }
