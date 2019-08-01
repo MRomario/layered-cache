@@ -71,6 +71,8 @@ class FileCacheTest extends TestCase
     {
         $this->expectException(KeyNotFoundException::class);
 
+        $this->fileCache->setSize(1);
+
         $this->fileCache->setSize(2);
         for ($i = 1; $i <= 3; ++$i) {
             if (1 === $i) {

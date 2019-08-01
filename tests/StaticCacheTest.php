@@ -66,6 +66,8 @@ class StaticCacheTest extends TestCase
     {
         $this->expectException(KeyNotFoundException::class);
 
+        $this->staticCache->setSize(5);
+
         for ($i = 1; $i <= 6; ++$i) {
             if (1 === $i) {
                 $this->staticCache->set('1', 1, -1000);

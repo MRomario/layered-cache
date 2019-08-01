@@ -49,8 +49,18 @@ class FileCache implements CacheInterface, LimitedSizeInterface
     {
         $this->checkIsEmptyKeyException($key);
 
-        $allCacheFiles = $this->getAllCacheFiles();
+        if (0 != $this->limitSize) {
+            $this->checkLimitSizeLayer();
+        }
 
+        $file = $this->getFile($key);
+        file_put_contents($file, $value, LOCK_EX);
+        touch($file, ($ttl + microtime(true)));
+    }
+
+    private function checkLimitSizeLayer(): void
+    {
+        $allCacheFiles = $this->getAllCacheFiles();
         if (count($allCacheFiles) >= $this->limitSize) {
             $tempArray = [];
             foreach ($allCacheFiles as $fileCheck) {
@@ -58,10 +68,6 @@ class FileCache implements CacheInterface, LimitedSizeInterface
             }
             unlink(array_keys($tempArray, min($tempArray))[0]);
         }
-
-        $file = $this->getFile($key);
-        file_put_contents($file, $value, LOCK_EX);
-        touch($file, ($ttl + microtime(true)));
     }
 
     /**

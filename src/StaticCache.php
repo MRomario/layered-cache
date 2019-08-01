@@ -23,7 +23,7 @@ class StaticCache implements CacheInterface, LimitedSizeInterface
      */
     protected $ttl = [];
 
-    public function __construct(int $size = 5)
+    public function __construct(int $size = 0)
     {
         $this->setSize($size);
     }
@@ -53,13 +53,21 @@ class StaticCache implements CacheInterface, LimitedSizeInterface
     {
         $this->checkIsEmptyKeyException($key);
 
-        if (count($this->data) >= $this->limitSize) {
-            $limitKey = array_keys($this->ttl, min($this->ttl));
-            unset($this->ttl[$limitKey[0]], $this->data[$limitKey[0]]);
+        if (0 != $this->limitSize) {
+            $this->checkLimitSizeLayer();
         }
 
         $this->ttl[$key] = microtime(true) + $ttl;
         $this->data[$key] = $value;
+    }
+
+    private function checkLimitSizeLayer()
+    {
+        if (count($this->data) >= $this->limitSize) {
+            $limitKey = array_keys($this->ttl, min($this->ttl));
+            $keyDelete = $limitKey[0];
+            unset($this->ttl[$keyDelete], $this->data[$keyDelete]);
+        }
     }
 
     public function clear(): void

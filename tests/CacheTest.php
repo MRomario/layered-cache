@@ -132,7 +132,25 @@ class CacheTest extends TestCase
         }
 
         $this->assertEquals(1, $this->cache->get('1'));
-        $this->assertEquals(3, $this->cache->get('3'));
+    }
+
+    public function testNoLimitCacheFromAllLayers(): void
+    {
+        $this->expectException(KeyNotFoundException::class);
+
+        $this->cache->addLayer($this->staticCache);
+        $this->cache->addLayer($this->fileCache);
+
+        for ($i = 1; $i <= 5; ++$i) {
+            if (1 === $i) {
+                $this->cache->set('1', 1, -3600);
+            }
+            $this->cache->set("$i", $i);
+        }
+
+        for ($i = 1; $i <= 6; ++$i) {
+            $this->assertEquals($i, $this->cache->get("$i"));
+        }
     }
 
     public function testClearCacheFromAllLayers(): void
