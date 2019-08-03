@@ -64,8 +64,7 @@ class StaticCache implements CacheInterface, LimitedSizeInterface
     private function checkLimitSizeLayer()
     {
         if (count($this->data) >= $this->limitSize) {
-            $limitKey = array_keys($this->ttl, min($this->ttl));
-            $keyDelete = $limitKey[0];
+            $keyDelete = array_keys($this->ttl, min($this->ttl))[0];
             unset($this->ttl[$keyDelete], $this->data[$keyDelete]);
         }
     }

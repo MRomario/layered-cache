@@ -18,7 +18,7 @@ class FileCache implements CacheInterface, LimitedSizeInterface
      *
      * @param int $size
      */
-    public function __construct(int $size = 5)
+    public function __construct(int $size = 0)
     {
         $this->setSize($size);
     }
@@ -49,7 +49,7 @@ class FileCache implements CacheInterface, LimitedSizeInterface
     {
         $this->checkIsEmptyKeyException($key);
 
-        if (0 != $this->limitSize) {
+        if ($this->limitSize) {
             $this->checkLimitSizeLayer();
         }
 
