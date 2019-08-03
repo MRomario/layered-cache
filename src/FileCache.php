@@ -4,12 +4,24 @@ namespace App;
 
 use App\Exception\KeyNotFoundException;
 use App\Traits\EmptyKeyExceptionTrait;
+use App\Traits\LimitedSizeTrait;
 use App\Traits\OutdatedCacheExceptionTrait;
 
-class FileCache implements CacheInterface
+class FileCache implements CacheInterface, LimitedSizeInterface
 {
     use EmptyKeyExceptionTrait;
     use OutdatedCacheExceptionTrait;
+    use LimitedSizeTrait;
+
+    /**
+     * FileCache constructor.
+     *
+     * @param int $size
+     */
+    public function __construct(int $size = 0)
+    {
+        $this->setSize($size);
+    }
 
     /**
      * {@inheritdoc}
@@ -37,10 +49,25 @@ class FileCache implements CacheInterface
     {
         $this->checkIsEmptyKeyException($key);
 
-        $timeLifeFile = microtime(true) + $ttl;
+        if ($this->limitSize) {
+            $this->checkLimitSizeLayer();
+        }
+
         $file = $this->getFile($key);
-        file_put_contents($file, $value);
-        touch($file, $timeLifeFile);
+        file_put_contents($file, $value, LOCK_EX);
+        touch($file, ($ttl + microtime(true)));
+    }
+
+    private function checkLimitSizeLayer(): void
+    {
+        $allCacheFiles = $this->getAllCacheFiles();
+        if (count($allCacheFiles) >= $this->limitSize) {
+            $tempArray = [];
+            foreach ($allCacheFiles as $fileCheck) {
+                $tempArray[$fileCheck] = filemtime($fileCheck);
+            }
+            unlink(array_keys($tempArray, min($tempArray))[0]);
+        }
     }
 
     /**
@@ -53,11 +80,22 @@ class FileCache implements CacheInterface
         return sys_get_temp_dir().DIRECTORY_SEPARATOR.md5($key).'.cache';
     }
 
+    /**
+     * @return array
+     */
+    private function getAllCacheFiles(): array
+    {
+        $allFiles = glob(sys_get_temp_dir().DIRECTORY_SEPARATOR.'*.cache');
+
+        return $allFiles ? $allFiles : [];
+    }
+
     public function clear(): void
     {
-        $files = glob(sys_get_temp_dir().DIRECTORY_SEPARATOR.'*.cache');
-        foreach ($files as $file) {
-            (!is_file($file)) ?: unlink($file);
+        foreach ($this->getAllCacheFiles() as $file) {
+            if (is_file($file)) {
+                unlink($file);
+            }
         }
     }
 }

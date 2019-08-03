@@ -13,12 +13,19 @@ use PHPUnit\Framework\TestCase;
 class StaticCacheTest extends TestCase
 {
     private $staticCache;
-    private $testValue = 'test value';
-    private $testKey = 'test';
+    private $testKey = '1';
+    private $testValue = 1;
 
     public function setUp(): void
     {
+        parent::setUp();
         $this->staticCache = new StaticCache();
+    }
+
+    public function tearDown(): void
+    {
+        parent::tearDown();
+        $this->staticCache->clear();
     }
 
     public function testSetValue(): void
@@ -27,47 +34,82 @@ class StaticCacheTest extends TestCase
         $this->assertEquals($this->testValue, $this->staticCache->get($this->testKey));
     }
 
-    public function testOutdatedTtl(): void
-    {
-        $this->expectException(OutdatedCacheException::class);
-        $ttl = -1111;
-
-        $this->staticCache->set($this->testKey, $this->testValue, $ttl);
-        $this->staticCache->get($this->testKey);
-    }
-
     public function testKeyNotFound(): void
     {
         $this->expectException(KeyNotFoundException::class);
-
-        $testKey = 'test';
-
-        $this->staticCache->set($testKey, $this->testValue);
         $this->staticCache->get('error');
     }
 
     public function testSetEmptyKey(): void
     {
         $this->expectException(EmptyKeyException::class);
-
-        $testKey = ' ';
-        $this->staticCache->set($testKey, $this->testValue);
+        $this->testKey = ' ';
+        $this->staticCache->set($this->testKey, $this->testValue);
     }
 
     public function testGetEmptyKey(): void
     {
         $this->expectException(EmptyKeyException::class);
-
-        $testKey = ' ';
-
-        $this->staticCache->set($testKey, $this->testValue);
+        $this->testKey = ' ';
+        $this->assertEquals($this->testKey, $this->staticCache->get($this->testKey, $this->testValue));
     }
 
-    public function testClearCache()
+    public function testOutdatedTtl(): void
+    {
+        $this->expectException(OutdatedCacheException::class);
+        $ttl = -1111;
+        $this->staticCache->set($this->testKey, $this->testValue, $ttl);
+        $this->staticCache->get($this->testKey);
+    }
+
+    public function testLimitCacheSix(): void
     {
         $this->expectException(KeyNotFoundException::class);
-        $this->staticCache->set('cat', 'cat');
-        $this->staticCache->clear('cat');
-        $this->staticCache->get('cat');
+
+        $this->staticCache->setSize(5);
+
+        for ($i = 1; $i <= 6; ++$i) {
+            if (1 === $i) {
+                $this->staticCache->set('1', 1, -1000);
+            }
+            $this->staticCache->set("$i", $i);
+        }
+        $this->assertEquals(1, $this->staticCache->get('1'));
+    }
+
+    public function testClearCache(): void
+    {
+        $this->expectException(KeyNotFoundException::class);
+        $this->staticCache->set('1', 1);
+        $this->staticCache->clear('1');
+        $this->staticCache->get('1');
+    }
+
+    public function testSetLimitSizeCache(): void
+    {
+        $this->expectException(KeyNotFoundException::class);
+        $this->staticCache->setSize(2);
+
+        for ($i = 1; $i <= 3; ++$i) {
+            if (1 === $i) {
+                $this->staticCache->set('1', 1, -1000);
+            }
+            $this->staticCache->set("$i", $i);
+        }
+        $this->assertEquals(1, $this->staticCache->get('1'));
+    }
+
+    public function testConstructorLimitCacheSize(): void
+    {
+        $this->expectException(KeyNotFoundException::class);
+
+        $staticCache = new StaticCache(2);
+        for ($i = 1; $i <= 3; ++$i) {
+            if (1 === $i) {
+                $staticCache->set('1', 1, -1000);
+            }
+            $staticCache->set("$i", $i);
+        }
+        $this->assertEquals(1, $staticCache->get('1'));
     }
 }
